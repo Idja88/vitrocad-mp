@@ -18,6 +18,7 @@ packages = ["api", "scripts"]
 
 [project.scripts]
 send_contract_notification = "scripts.send_contract_notification:send_contract_notification"
+update_counter = "scripts.update_counter:update_counter"
 
 [tool.uv]
 package = true
