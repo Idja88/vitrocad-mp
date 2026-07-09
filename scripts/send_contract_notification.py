@@ -38,10 +38,6 @@ def send_contract_notification():
             print("No contracts found or error retrieving contracts")
             return
         
-        # Ensure contracts is a list
-        #if isinstance(contracts, dict):
-        #    contracts = [contracts]
-        
         for contract in contracts:
             # Get contract details
             contract_id = contract.get('fieldValueMap', {}).get('id')
@@ -59,9 +55,9 @@ def send_contract_notification():
             )
             
             if result:
-                print(f"✓ Email sent to {contract_holder_email} for contract {contract_id}")
+                print(f"Email sent to {contract_holder_email} for contract {contract_id}")
             else:
-                print(f"✗ Failed to send email to {contract_holder_email} for contract {contract_id}")
+                print(f"Failed to send email to {contract_holder_email} for contract {contract_id}")
         
     finally:
         client.close()
