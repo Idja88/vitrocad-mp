@@ -51,6 +51,7 @@ def send_contract_notification():
             contract_holder_email = contract_holder.get('fieldValueMap', {}).get('email')
             
             if not contract_holder_email:
+                print(f"No email found for contract holder of contract {contract_id}")
                 continue
             
             # Send email
