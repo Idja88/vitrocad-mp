@@ -10,10 +10,16 @@ def send_contract_notification():
     
     # Configuration
     contract_list_id = os.getenv('VITRO_CAD_CONTRACT_LIST_ID')
-    contract_type_id = os.getenv('VITRO_CAD_CONTRACT_TYPE_ID')
-    sub_contract_type_id = os.getenv('VITRO_CAD_SUB_CONTRACT_TYPE_ID')
+    contract_type_id_list = os.getenv('VITRO_CAD_CONTRACT_TYPE_ID_LIST')
     email_template_id = os.getenv('VITRO_CAD_CONTRACT_EMAIL_TEMPLATE_ID')
     days_until_expiry = int(os.getenv('VITRO_CAD_CONTRACT_DAYS_UNTIL_EXPIRY'))
+
+    if contract_type_id_list:
+        contract_type_id_list = [ctid.strip() for ctid in contract_type_id_list.split(',') if ctid.strip()]
+    else:
+        contract_type_id_list = []
+    
+    contract_type_id_list_str = ', '.join([f'Guid(\"{id}\")' for id in contract_type_id_list])
 
     # Initialize client
     client = VitroCADAPIClient()
@@ -24,13 +30,13 @@ def send_contract_notification():
         today_local = datetime.now(local_tz).replace(hour=0, minute=0, second=0, microsecond=0)
         expiry_date_local = today_local + timedelta(days=days_until_expiry)
         expiry_date_utc = expiry_date_local.astimezone(timezone.utc)
-        
+    
         # Build query with UTC dates and DateTimeKind.Utc
-        query = f"item => (item.ContentTypeId == Guid(\"{contract_type_id}\") || item.ContentTypeId == Guid(\"{sub_contract_type_id}\")) && \
+        query = f"item => new Guid[] {{ {contract_type_id_list_str} }}.Contains(item.ContentTypeId) &&  \
             item.GetLookupId(\"contract_holder\") != null && \
             item.GetValueAsDateTime(\"project_contract_end_date_auto\") == \
-            DateTime.SpecifyKind(DateTime({expiry_date_utc.year}, {expiry_date_utc.month}, {expiry_date_utc.day}, {expiry_date_utc.hour}, {expiry_date_utc.minute}, {expiry_date_utc.second}), DateTimeKind.Utc)"
-
+            DateTime({expiry_date_utc.year}, {expiry_date_utc.month}, {expiry_date_utc.day}, {expiry_date_utc.hour}, {expiry_date_utc.minute}, {expiry_date_utc.second}, DateTimeKind.Utc)"
+        
         # Get filtered contracts from server
         contracts = client.get_recursive_mp_list(contract_list_id, query=query)
 
