@@ -34,7 +34,7 @@ def send_contract_notification():
         # Build query with UTC dates and DateTimeKind.Utc
         query = f"item => new Guid[] {{ {contract_type_id_list_str} }}.Contains(item.ContentTypeId) &&  \
             item.GetLookupId(\"contract_holder\") != null && \
-            item.GetValueAsDateTime(\"project_contract_end_date_auto\") == \
+            item.GetValueAsDateTime(\"vitro_base_contract_finish_date\") == \
             DateTime({expiry_date_utc.year}, {expiry_date_utc.month}, {expiry_date_utc.day}, {expiry_date_utc.hour}, {expiry_date_utc.minute}, {expiry_date_utc.second}, DateTimeKind.Utc)"
         
         # Get filtered contracts from server
